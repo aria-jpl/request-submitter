@@ -1,0 +1,69 @@
+{
+  "command":"/home/ops/verdi/ops/request-submitter/initiate_request_enumurator.sh",
+  "imported_worker_files": {
+    "$HOME/.netrc": "/home/ops/.netrc",
+    "$HOME/.aws": "/home/ops/.aws",
+    "$HOME/verdi/etc/settings.json": "/home/ops/verdi/ops/request-submitter/settings.json",
+    "$HOME/verdi/etc/settings.conf": "/home/ops/ariamh/conf/settings.conf",
+    "$HOME/verdi/etc/settings.conf": "/home/ops/verdi/ops/request-submitter/settings.conf"
+  },
+  "disk_usage":"100GB",
+  "soft_time_limit": 14400,
+  "time_limit": 15000,
+  "disk_usage": "2GB",
+  "recommended-queues": [ "aria-request-enumerator" ],
+  "params" : [
+    {
+      "name": "workflow",
+      "destination": "positional"
+    },
+    {
+        "name": "dataset_version",
+        "destination": "context"
+    },
+    {
+      "name": "minMatch",
+      "destination": "context"
+    },
+    {
+      "name": "threshold_pixel",
+      "destination": "context"
+    },
+    {
+      "name": "acquisition_version",
+       "destination": "context"
+    },
+    {
+      "name": "track_numbers",
+      "destination": "context"
+    },
+    {
+      "name": "location_geojson",
+      "destination": "context"
+    },
+    {
+      "name": "machine_tags",
+      "destination": "context"
+    },
+    {
+      "name": "skipDays",
+      "destination": "context"
+    },
+    {
+        "name": "starttime",
+        "destination": "context"
+    },
+    {
+        "name": "endtime",
+        "destination": "context"
+    },
+    {
+        "name": "platform",
+        "destination": "context"
+    },
+    {
+      "name":"localize_products",
+      "destination":"localize"
+    }
+  ]
+}
