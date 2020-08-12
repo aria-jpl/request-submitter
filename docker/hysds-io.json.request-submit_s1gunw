@@ -1,0 +1,13 @@
+{
+  "label" : "Request S1-GUNW - runconfig-acqlist_localizer",
+  "allowed_accounts": [ "ops" ],
+  "enable_dedup": false,
+  "params" : [
+    {
+      "name": "machine_tag",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "request id"
+    }
+  ]
+}
