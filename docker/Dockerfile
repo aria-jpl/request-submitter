@@ -1,7 +1,7 @@
 FROM hysds/isce2:latest-es1
 
 MAINTAINER mkarim "Mohammed.R.Karim@jpl.nasa.gov"
-LABEL description="standard_product"
+LABEL description="request-submitter"
 
 ARG git_oauth_token
 ARG id
@@ -31,7 +31,7 @@ USER ops
 #COPY .netrc /home/ops/.netrc
 
 # copy packages
-COPY . /home/ops/verdi/ops/standard_product
+COPY . /home/ops/verdi/ops/request-submitter
 
 #RUN /opt/conda/bin/conda install --yes basemap
 
@@ -65,9 +65,9 @@ RUN set -ex \
 
 
 RUN set -ex \
- && sudo chown -R ops:ops /home/ops/verdi/ops/standard_product \
- && mv /home/ops/verdi/ops/standard_product/multi_acquisition_localizer /home/ops/verdi/ops/ \
- && mv /home/ops/verdi/ops/standard_product/ariamh/ /home/ops/ 
+ && sudo chown -R ops:ops /home/ops/verdi/ops/request-submitter \
+ && mv /home/ops/verdi/ops/request-submitter/multi_acquisition_localizer /home/ops/verdi/ops/ \
+ && mv /home/ops/verdi/ops/request-submitter/ariamh/ /home/ops/ 
 
 
 

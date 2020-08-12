@@ -14,7 +14,7 @@ import backoff
 from hysds.celery import app
 from hysds.dataset_ingest import ingest
 
-from standard_product_localizer import publish_topsapp_runconfig_data, publish_ifgcfg_data, get_acq_object
+from request_localizer import publish_topsapp_runconfig_data, publish_ifgcfg_data, get_acq_object
 
 
 # set logger
@@ -271,7 +271,7 @@ def main():
     slc_id = ctx['slc_id']
     slc_version = ctx['slc_version']
     acq_version = ctx['acquisition_version']
-    output_dataset_type = ctx.get("output_dataset_type", "ifgcfg")
+    output_dataset_type = ctx.get("output_dataset_type", "runconfig-topsapp")
     acq_id = resolve_acq(slc_id, acq_version)
     logger.info("acq_id: {}".format(acq_id))
 

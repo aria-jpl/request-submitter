@@ -435,7 +435,7 @@ def sling(acq_info, spyddder_extract_version, multi_acquisition_localizer_versio
     job_priorities = []
     job_types = []
     job_versions = []
-    #standard_product_ifg_versions = []
+    #request_ifg_versions = []
     dem_types = []
     tracks = []
     starttimes = []
@@ -457,7 +457,7 @@ def sling(acq_info, spyddder_extract_version, multi_acquisition_localizer_versio
     acq_infoes.append(acq_info)
     projects.append(project)
     job_priorities.append(job_priority)
-    #standard_product_ifg_versions.append(standard_product_ifg_version)
+    #request_ifg_versions.append(request_ifg_version)
     dem_types.append(dem_type)
     tracks.append(track)
     starttimes.append(starttime)
@@ -543,7 +543,7 @@ def sling2(acq_info, spyddder_extract_version, multi_acquisition_localizer_versi
     job_priorities = []
     job_types = []
     job_versions = []
-    #standard_product_ifg_versions = []
+    #request_ifg_versions = []
     dem_types = []
     tracks = []
     starttimes = []
@@ -565,7 +565,7 @@ def sling2(acq_info, spyddder_extract_version, multi_acquisition_localizer_versi
     acq_infoes.append(acq_info)
     projects.append(project)
     job_priorities.append(job_priority)
-    #standard_product_ifg_versions.append(standard_product_ifg_version)
+    #request_ifg_versions.append(request_ifg_version)
     dem_types.append(dem_type)
     tracks.append(track)
     starttimes.append(starttime)
@@ -656,7 +656,7 @@ def publish_data( acq_info, project, job_priority, dem_type, track,starttime, en
     job_queue = "%s-job_worker-large" % project
     list_master_dt = ""
     list_slave_dt = ""
-    #job_type = "job-standard-product-ifg:%s" %standard_product_ifg_version
+    #job_type = "job-standard-product-ifg:%s" %request_ifg_version
     try:
         list_master_dt, list_slave_dt = util.get_acq_dates(master_scene, slave_scene)
     except Exception as err:
@@ -685,7 +685,7 @@ def publish_data( acq_info, project, job_priority, dem_type, track,starttime, en
     md['project'] =  project,
     #md['master_ids'] = master_ids_str
     #md['slave_ids'] = slave_ids_str
-    #md['standard_product_ifg_version'] = standard_product_ifg_version
+    #md['request_ifg_version'] = request_ifg_version
     md['priority'] = job_priority
     md['azimuth_looks'] = 19
     md['range_looks'] = 7
@@ -717,7 +717,7 @@ def publish_data( acq_info, project, job_priority, dem_type, track,starttime, en
     print("creating dataset file : %s" %ds_file)
     create_dataset_json(id, version, met_file, ds_file)
 
-def submit_ifg_job( acq_info, project, standard_product_ifg_version, job_priority, wuid=None, job_num=None):
+def submit_ifg_job( acq_info, project, request_ifg_version, job_priority, wuid=None, job_num=None):
     """Map function for create interferogram job json creation."""
 
     if wuid is None or job_num is None:
@@ -803,7 +803,7 @@ def submit_ifg_job( acq_info, project, standard_product_ifg_version, job_priorit
 	    "priority" : job_priority,
 
             # v2 cmd
-            "_command": "/home/ops/ariamh/interferogram/sentinel/sciflo_create_standard_product.sh",
+            "_command": "/home/ops/ariamh/interferogram/sentinel/sciflo_create_request.sh",
 
             # disk usage
             "_disk_usage": disk_usage,
@@ -831,7 +831,7 @@ def submit_sling_job2(id_hash, project, spyddder_extract_version, multi_acquisit
         "kwargs":'{}'
     }
 
-    sling_job_name = "standard_product-%s-%s" %(job_type, id_hash )
+    sling_job_name = "request-%s-%s" %(job_type, id_hash )
 
 
     params = [
