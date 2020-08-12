@@ -1,6 +1,6 @@
 {     
   "submission_type": "iteration",
-  "label": "Standard Product S1-GUNW - acqlist_evaluator",
+  "label": "Request S1-GUNW - runconfig-acqlist_evaluator",
   "allowed_accounts": [ "ops" ],
   "enable_dedup": false,
   "params" : [ 
@@ -17,7 +17,7 @@
       "value": "v2.0.0"
     },
     { 
-      "name": "acqlist_version",
+      "name": "runconfig-acqlist_version",
       "from": "submitter",
       "type": "text",
       "default": "v2.0.0" 
