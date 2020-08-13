@@ -276,6 +276,23 @@ def check_prod_avail(session, link):
     return response.status_code
 
 
+def publish_dataset(id, md, version):
+    prod_dir =  id
+    os.makedirs(prod_dir, 0o755)
+
+    met_file = os.path.join(prod_dir, "{}.met.json".format(id))
+    ds_file = os.path.join(prod_dir, "{}.dataset.json".format(id))
+
+
+    with open(met_file, 'w') as f: json.dump(md, f, indent=2)
+
+
+    print("creating dataset file : %s" %ds_file)
+    create_dataset_json(id, version, met_file, ds_file)
+
+    return prod_dir
+
+
 def get_scihub_manifest(session, info):
     """Get manifest information."""
 
@@ -2069,9 +2086,10 @@ def create_dataset_json(id, version, met_file, ds_file):
         logger.warn(str(err))
         logger.warn("Traceback: {}".format(traceback.format_exc()))
 
-
-    ds['starttime'] = md['starttime']
-    ds['endtime'] = md['endtime']
+    if 'starttime' in md:
+        ds['starttime'] = md['starttime']
+    if 'endtime' in md:
+        ds['endtime'] = md['endtime']
 
     # write out dataset json
     with open(ds_file, 'w') as f:
