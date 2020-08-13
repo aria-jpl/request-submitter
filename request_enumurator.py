@@ -43,8 +43,11 @@ logger.addFilter(LogFilter())
 
 ACQ_LIST_ID_TMPL = "S1-GUNW-acqlist-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}"
 ACQ_RESULT_ID_TMPL = "S1-GUNW-acqlist-audit_trail-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}-{}"
-REQUEST_ACQ_LIST_ID_TMPL = "S1-GUNW-runconfig-acqlist-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}"
-REQUEST_ACQ_RESULT_ID_TMPL = "S1-GUNW-runconfig-acqlist-audit_trail-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}-{}"
+#REQUEST_ACQ_LIST_ID_TMPL = "S1-GUNW-runconfig-acqlist-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}"
+#REQUEST_ACQ_RESULT_ID_TMPL = "S1-GUNW-runconfig-acqlist-audit_trail-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}-{}"
+
+REQUEST_ACQ_LIST_ID_TMPL = "runconfig-acqlist-{}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}"
+REQUEST_ACQ_RESULT_ID_TMPL = "runconfig-acqlist-audit_trail-{}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}"
 
 BASE_PATH = os.path.dirname(__file__)
 covth = 0.98
@@ -1152,7 +1155,9 @@ def publish_initiator_pair(candidate_pair, publish_job_data, orbit_data, aoi_id,
     id = ACQ_LIST_ID_TMPL.format('M', len(master_acquisitions), len(slave_acquisitions), track, list_master_dt, list_slave_dt, orbit_type, id_hash[0:4])
 
     if is_request:
-        id = REQUEST_ACQ_LIST_ID_TMPL.format('M', len(master_acquisitions), len(slave_acquisitions), track, list_master_dt, list_slave_dt, orbit_type, id_hash[0:4])
+        request_id = util.get_request_id(TAG_LIST)
+        #REQUEST_ACQ_LIST_ID_TMPL = "runconfig-acqlist-{}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}"
+        id = REQUEST_ACQ_LIST_ID_TMPL.format(requset_id, track, list_master_dt, list_slave_dt, id_hash[0:4])
 
     #id = "acq-list-%s" %id_hash[0:4]
     prod_dir =  id
@@ -1296,18 +1301,16 @@ def publish_result(reference_result, secondary_result, id_hash):
     logger.info("secondary_result.get('list_slave_dt', '') : %s" %secondary_result.get('list_slave_dt', ''))
     logger.info("%s : %s : %s" %( orbit_type, id_hash[0:4], reference_result.get('aoi', '')))
 
-    REQUEST_ACQ_RESULT_ID_TMPL = "S1-GUNW-runconfig-acqlist-audit_trail-R{}-M{:d}S{:d}-TN{:03d}-{}-{}-{}-{}"
-    ACQ_RESULT_ID_TMPL = "S1-GUNW-acqlist-audit_trail-R{}-M{:d}S{:d}-TN{:03d}-{}-{}-{}-{}"
-    #id = ACQ_RESULT_ID_TMPL.format('M', secondary_result.get('master_count', 0), secondary_result.get('slave_count', 0), secondary_result.get('track', 0), update_dateformat2(secondary_result.get('list_master_dt', '')), update_dateformat2(secondary_result.get('list_slave_dt', '')), orbit_type, id_hash[0:4], reference_result.get('aoi', ''))
-
-    
-    id = ACQ_RESULT_ID_TMPL.format('M', secondary_result.get('master_count', 0), secondary_result.get('slave_count', 0), secondary_result.get('track', 0), update_dateformat2(secondary_result.get('list_master_dt', '')), update_dateformat2(secondary_result.get('list_slave_dt', '')), orbit_type, id_hash[0:4])
-    
+    id = None
     if is_request:
-        id = REQUEST_ACQ_RESULT_ID_TMPL.format('M', secondary_result.get('master_count', 0), secondary_result.get('slave_count', 0), secondary_result.get('track', 0), update_dateformat2(secondary_result.get('list_master_dt', '')), update_dateformat2(secondary_result.get('list_slave_dt', '')), orbit_type, id_hash[0:4])
- 
+        request_id = util.get_request_id(TAG_LIST)
+        REQUEST_ACQ_RESULT_ID_TMPL = "runconfig-acqlist-audit_trail-{}-TN{:03d}-{}-{}-{}"
+        id = REQUEST_ACQ_RESULT_ID_TMPL.format(request_id, secondary_result.get('track', 0), update_dateformat2(secondary_result.get('list_master_dt', '')), update_dateformat2(secondary_result.get('list_slave_dt', '')), id_hash[0:4])
+    else:
+        ACQ_RESULT_ID_TMPL = "S1-GUNW-acqlist-audit_trail-R{}-M{:d}S{:d}-TN{:03d}-{}-{}-{}-{}"
+        id = ACQ_RESULT_ID_TMPL.format('M', secondary_result.get('master_count', 0), secondary_result.get('slave_count', 0), secondary_result.get('track', 0), update_dateformat2(secondary_result.get('list_master_dt', '')), update_dateformat2(secondary_result.get('list_slave_dt', '')), orbit_type, id_hash[0:4])
+    
     logger.info("publish_result : id : %s " %id)
-    #id = "acq-list-%s" %id_hash[0:4]
     prod_dir =  id
     os.makedirs(prod_dir, 0o755)
 
