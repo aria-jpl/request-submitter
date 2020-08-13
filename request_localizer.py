@@ -504,8 +504,8 @@ def sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_
         logger.info("successfully completed localizing slave slcs")
 
 
-    logger.info("Sling Jobs Submission Done. Exiting")
-    sys.exit()
+    logger.info("Sling Jobs Submission Done. Returning")
+    return
 
 def get_id_hash(acq_info, job_priority, dem_type):
     id_hash = ""
