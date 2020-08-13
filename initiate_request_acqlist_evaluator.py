@@ -300,20 +300,7 @@ def main():
         for acq in acqlist['metadata']['slave_acquisitions']:
             acq_info[acq] = get_acq_object(acq, "slave")
         if all_slcs_exist(list(acq_info.keys()), acq_version, slc_version):
-            if output_dataset_type == "ifgcfg":
-                prod_dir = publish_ifgcfg_data(acq_info, acqlist['metadata']['project'], acqlist['metadata']['job_priority'],
-                                    acqlist['metadata']['dem_type'], acqlist['metadata']['track_number'], acqlist['metadata']['tags'],
-                                    acqlist['metadata']['starttime'], acqlist['metadata']['endtime'],
-                                    acqlist['metadata']['master_scenes'], acqlist['metadata']['slave_scenes'],
-                                    acqlist['metadata']['master_acquisitions'], acqlist['metadata']['slave_acquisitions'],
-                                    acqlist['metadata']['orbitNumber'], acqlist['metadata']['direction'],
-                                    acqlist['metadata']['platform'], acqlist['metadata']['union_geojson'],
-                                    acqlist['metadata']['bbox'], acqlist['metadata']['full_id_hash'],
-                                    acqlist['metadata']['master_orbit_file'], acqlist['metadata']['slave_orbit_file'], tag_list)
-                logger.info(
-                    "Created ifg-cfg {} for acq-list {}.".format(prod_dir, acqlist['id']))
-            elif output_dataset_type == "runconfig-topsapp":
-                prod_dir = publish_topsapp_runconfig_data(acq_info, acqlist['metadata']['project'], acqlist['metadata']['job_priority'],
+            prod_dir = publish_topsapp_runconfig_data(acq_info, acqlist['metadata']['project'], acqlist['metadata']['job_priority'],
                                     acqlist['metadata']['dem_type'], acqlist['metadata']['track_number'], acqlist['metadata']['tags'],
                                     acqlist['metadata']['starttime'], acqlist['metadata']['endtime'],
                                     acqlist['metadata']['master_scenes'], acqlist['metadata']['slave_scenes'],
