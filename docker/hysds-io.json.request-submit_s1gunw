@@ -1,5 +1,5 @@
 {
-  "label" : "Request S1-GUNW - runconfig-acqlist_localizer",
+  "label" : "Request S1-GUNW - submitter",
   "allowed_accounts": [ "ops" ],
   "enable_dedup": false,
   "params" : [
