@@ -10,6 +10,7 @@ import logging
 import traceback
 import shutil
 import backoff
+import util
 
 from hysds.celery import app
 from hysds.dataset_ingest import ingest
@@ -215,7 +216,18 @@ def get_request_id_from_machine_tag(machine_tag):
         machine_tag = machine_tag.strip().split(',')
     return util.get_request_id(machine_tag)
 
+def create_output_metadata(request_submitted_md, request_data):
+    exclude_List = ['id', 'metadata',  'images', 'prov', 'geojson_polygon']
+    
+    request_data = request_data["_source"]
+    for k in request_data:
+        logger.info(k)
+        if k not in exclude_List:
+            request_submitted_md[k] = request_data[k]
 
+    logger.info("request_submitted_md : {}".format(json.dumps(request_submitted_md, indent=2)))
+    return request_submitted_md    
+    
 def main():
     """Main."""
 
@@ -227,7 +239,7 @@ def main():
         ctx = json.load(f)
 
     machine_tag = ctx["machine_tag"]
-    runconfig-acqlist_version = ctx["runconfig-acqlist_version"]
+    acqlist_version = ctx["runconfig-acqlist_version"]
     output_dataset_version = ctx['output_dataset_version']
     
     # build args
@@ -239,15 +251,29 @@ def main():
 
     request_id = get_request_id_from_machine_tag(machine_tag)
     if not request_id:
-        raise Exception("request id not found in machine tag : {}".format(machine_tag)
+        raise Exception("request id not found in machine tag : {}".format(machine_tag))
 
     es_index = "grq_{}_runconfig-acq-list".format(acqlist_version)
-    output_dataset_index = "grq_{}_s1-gunw-ifg-cfg".format(output_dataset_version)
-    if output_dataset_type == "runconfig-topsapp":
-        es_index = "grq_{}_s1-gunw-runconfig-acq-list".format(acqlist_version)
-        output_dataset_index = "grq"
+    #output_dataset_index = "grq_{}_s1-gunw-ifg-cfg".format(output_dataset_version)
+    output_dataset_index = "grq"
+    #request_data = query_es("grq", request_id)
+    request_data = util.get_complete_grq_data(request_id)[0]
+    logger.info(json.dumps(request_data, indent = 4))
 
-    request_data = query_es("grq", request_id)
+    request_submitted_md = {}
+    request_submitted_md = create_output_metadata(request_submitted_md, request_data)
+
+    #request_submitted_md[""] = request_data.get("", None)
+    request_submitted_md["program_pi_id"] = request_data.get("program_pi_id", None)
+    request_submitted_md[""] = request_data.get("", None)
+    request_submitted_md[""] = request_data.get("", None)
+    request_submitted_md[""] = request_data.get("", None)
+    request_submitted_md[""] = request_data.get("", None)
+
+    program_pi_id = request_data
+
+
+
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
     for acqlist in acqlists:
