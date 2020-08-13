@@ -20,6 +20,18 @@
       "from": "submitter",
       "type": "text",
       "default": "v2.0.0"
+    },
+    { "name": "geocoded_unfiltered_coherence",
+      "from": "submitter",
+      "type": "enum",
+      "default": "exclude",
+      "enumerables": ["exclude", "include"]
+    },
+    { "name": "geocoded_unfiltered_wrapped_phase",
+      "from": "submitter",
+      "type": "enum",
+      "default": "exclude",
+      "enumerables": ["exclude", "include"]
     }
   ]
 }

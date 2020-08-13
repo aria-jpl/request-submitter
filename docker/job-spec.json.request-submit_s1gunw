@@ -24,6 +24,14 @@
     {
         "name": "output_dataset_version",
         "destination": "context"
+    },
+    {
+        "name": "geocoded_unfiltered_coherence",
+        "destination": "context"
+    },
+    {
+        "name": "geocoded_unfiltered_wrapped_phase",
+        "destination": "context"
     }
   ]
 }

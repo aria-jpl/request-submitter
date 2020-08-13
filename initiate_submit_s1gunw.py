@@ -146,6 +146,9 @@ def main():
     machine_tag = ctx["machine_tag"]
     acqlist_version = ctx["runconfig-acqlist_version"]
     output_dataset_version = ctx['output_dataset_version']
+    geocoded_unfiltered_coherence = ctx['geocoded_unfiltered_coherence']
+    geocoded_unfiltered_wrapped_phase = ctx['geocoded_unfiltered_wrapped_phase']
+
     output_dataset_type = "request-submit"
     
     esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
@@ -173,6 +176,8 @@ def main():
     request_submitted_id = request_id.replace("request", "request-submit", 1)
     request_submitted_md = {}
     request_submitted_md = create_output_metadata(request_submitted_md, request_data)
+    request_submitted_id['geocoded_unfiltered_coherence'] = geocoded_unfiltered_coherence
+    request_submitted_id['geocoded_unfiltered_wrapped_phase'] = geocoded_unfiltered_wrapped_phase
 
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
