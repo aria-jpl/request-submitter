@@ -285,7 +285,7 @@ def main():
             logger.info(err_msg)
             raise Exception(err_msg)
 
-    acqlist_version = ctx['acqlist_version']
+    acqlist_version = ctx['runconfig-acqlist_version']
     es_index = "grq_{}_s1-gunw-acq-list".format(acqlist_version)
     output_dataset_index = "grq_{}_s1-gunw-ifg-cfg".format(output_dataset_version)
     if output_dataset_type == "runconfig-topsapp":
