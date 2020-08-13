@@ -15,9 +15,11 @@ from hysds.celery import app
 from hysds_commons.job_utils import submit_mozart_job
 import traceback
 from fetchOrbitES import fetch
+try:
+    import acquisition_localizer_multi
+except:
+    import multi_acquisition_localizer.acquisition_localizer_multi
 
-try: import acquisition_localizer_multi
-except: pass
 
 
 # set logger
@@ -408,9 +410,16 @@ def resolve_source(ctx_file):
 
     job_type, job_version = ctx['job_specification']['id'].split(':')
     input_metadata = ctx["input_metadata"]
-    return process_acqlist_localization(input_metadata, job_type, job_version, project)
+  
+    esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
+    asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
+    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "develop")
+    multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "develop")
 
-def process_acqlist_localization(input_metadata, job_type, job_version, project):
+    return process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project)
+    
+
+def process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project):
 
     dem_type= input_metadata["dem_type"]
     track = input_metadata["track_number"]
@@ -434,17 +443,11 @@ def process_acqlist_localization(input_metadata, job_type, job_version, project)
     #esa_download_queue = "slc-sling-extract-scihub"
     #asf_ngap_download_queue = "slc-sling-extract-asf"
 
-    esa_download_queue = get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
-    asf_ngap_download_queue = get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
-
     union_geojson = input_metadata["union_geojson"]
     direction = input_metadata["direction"] 
     platform = input_metadata["platform"]
-    spyddder_sling_extract_version = get_value(ctx, "spyddder_sling_extract_version", "develop")
-    multi_acquisition_localizer_version = get_value(ctx, "multi_acquisition_localizer_version", "develop")
 
     job_priority = input_metadata["job_priority"]
-    job_type, job_version = ctx['job_specification']['id'].split(':') 
 
     orbitNumber = []
     if "orbitNumber" in input_metadata:
