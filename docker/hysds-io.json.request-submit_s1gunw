@@ -4,16 +4,22 @@
   "enable_dedup": false,
   "params" : [
     {
+      "name": "machine_tag",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "request id"
+    },
+    {
       "name": "runconfig-acqlist_version",
       "from": "submitter",
       "type": "text",
       "default": "v2.0.0"
     },
     {
-      "name": "machine_tag",
-      "from": "submitter",
+      "name": "output_dataset_version",
+      "from": "value",
       "type": "text",
-      "placeholder": "request id"
+      "default": "v2.0.0"
     }
   ]
 }

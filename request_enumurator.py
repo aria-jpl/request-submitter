@@ -1157,7 +1157,7 @@ def publish_initiator_pair(candidate_pair, publish_job_data, orbit_data, aoi_id,
     if is_request:
         request_id = util.get_request_id(TAG_LIST)
         #REQUEST_ACQ_LIST_ID_TMPL = "runconfig-acqlist-{}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}"
-        id = REQUEST_ACQ_LIST_ID_TMPL.format(requset_id, track, list_master_dt, list_slave_dt, id_hash[0:4])
+        id = REQUEST_ACQ_LIST_ID_TMPL.format(request_id, track, list_master_dt, list_slave_dt, id_hash[0:4])
 
     #id = "acq-list-%s" %id_hash[0:4]
     prod_dir =  id

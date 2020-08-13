@@ -14,11 +14,15 @@
   "recommended-queues": [ "aria-standard_product-evaluator" ],
   "params" : [
     {
+        "name": "machine_tag",
+        "destination": "context"
+    },
+    {
         "name": "runconfig-acqlist_version",
         "destination": "context"
     },
     {
-        "name": "machine_tag",
+        "name": "output_dataset_version",
         "destination": "context"
     }
   ]
