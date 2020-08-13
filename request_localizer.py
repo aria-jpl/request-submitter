@@ -504,8 +504,8 @@ def sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_
         logger.info("successfully completed localizing slave slcs")
 
 
-    logger.info("Sling Jobs Submission Done. Returning ..")
-    return
+    logger.info("Sling Jobs Submission Done. Exiting")
+    sys.exit()
 
 def get_id_hash(acq_info, job_priority, dem_type):
     id_hash = ""
@@ -644,16 +644,17 @@ def publish_ifgcfg_data( acq_info, project, job_priority, dem_type, track, aoi_i
     
     return publish_dataset(id, md)
 
-def publish_dataset(id, md):
+def publish_dataset(id, md, version="v2.0"):
     prod_dir =  id
-    os.makedirs(prod_dir, 0o755)
+    if not os.path.isdir(prod_dir):
+        os.makedirs(prod_dir, 0o755)
 
     met_file = os.path.join(prod_dir, "{}.met.json".format(id))
     ds_file = os.path.join(prod_dir, "{}.dataset.json".format(id))
 
 
     with open(met_file, 'w') as f: json.dump(md, f, indent=2)
-
+    
 
     print("creating dataset file : %s" %ds_file)
     create_dataset_json(id, version, met_file, ds_file)
@@ -666,17 +667,25 @@ def publish_topsapp_runconfig_data( acq_info, project, job_priority, dem_type, t
 
     id, md = get_ifgcfg_metadata( acq_info, project, job_priority, dem_type, track, aoi_id, starttime, endtime, master_scene, slave_scene, master_acqs, slave_acqs, orbitNumber, direction, platform, union_geojson, bbox, ifg_hash, in_master_orbit_file, in_slave_orbit_file, True, tag_list)
 
-    md["tags"] = tag_list
     request_id = util.get_request_id(tag_list)
+    
     if not request_id:
         err_msg = "No request id found in runconfig-acqlist with tags  : {}".format(tag_list)
         logger.info(err_msg)
         raise Exception(err_msg)
-
+    
+    request_submit_id = request_id.replace("request", "request-submit", 1)
+   
     #Search GRQ for request metadata
-    data = query_es(GRQ_ES_ENDPOINT, request_id)
-    md["request_metadata"] = data["metadata"]
-
+    data = query_es(GRQ_ES_ENDPOINT, request_submit_id)
+    request_md =  data["_source"]["metadata"]
+    logger.info("data : {}".format(json.dumps(data, indent = 2)))
+    md["request_metadata"] = request_md
+    md["tags"] = request_md["tags"]
+    md["geocoded_unfiltered_coherence"] = request_md["geocoded_unfiltered_coherence"]
+    md["geocoded_unfiltered_wrapped_phase"] = request_md["geocoded_unfiltered_wrapped_phase"]
+ 
+    
     return publish_dataset(id, md)
 
 
@@ -771,12 +780,6 @@ def get_ifgcfg_metadata( acq_info, project, job_priority, dem_type, track, aoi_i
         request_id = util.get_request_id(tag_list)
         id = REQUEST_IFG_CFG_ID_TMPL.format(request_id, track, parser.parse(slc_master_dt.strftime('%Y%m%dT%H%M%S')), parser.parse(slc_slave_dt.strftime('%Y%m%dT%H%M%S')), ifg_hash[0:4])
 
-    prod_dir =  id
-    os.makedirs(prod_dir, 0o755)
-
-    met_file = os.path.join(prod_dir, "{}.met.json".format(id))
-    ds_file = os.path.join(prod_dir, "{}.dataset.json".format(id))
- 
     logger.info("master_orbit_file : %s" %master_orbit_file)
     logger.info("slave_orbit_file : %s" %slave_orbit_file)
  
