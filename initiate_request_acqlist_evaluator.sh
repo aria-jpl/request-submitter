@@ -16,7 +16,8 @@ source $ARIAMH_HOME/giant.sh
 export TROPMAP_HOME=$HOME/tropmap
 export UTILS_HOME=$ARIAMH_HOME/utils
 export GIANT_HOME=/usr/local/giant/GIAnT
-export PYTHONPATH=${HOME}/verdi/etc:$ISCE_HOME/applications:$ISCE_HOME/components:$BASE_PATH:$ARIAMH_HOME:$TROPMAP_HOME:$GIANT_HOME:$PYTHONPATH
+export MAL_HOME=${HOME}/verdi/ops/multi_acquisition_localizer
+export PYTHONPATH=${HOME}/verdi/etc:$ISCE_HOME/applications:$ISCE_HOME/components:$BASE_PATH:$ARIAMH_HOME:$TROPMAP_HOME:$GIANT_HOME:$MAL_HOME:$PYTHONPATH
 export PATH=$BASE_PATH:$TROPMAP_HOME:$GMT_HOME/bin:$PATH
 
 # source environment
