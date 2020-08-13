@@ -142,31 +142,26 @@ def all_slcs_exist(acq_ids, acq_version, slc_version):
     return True
 
 
-def get_acqlists_by_acqid(acq_id, acqlist_version):
+def get_acqlists_by_request_id(request_id, acqlist_version):
     """Return all acq-list datasets that contain the acquisition ID."""
 
     query = {
         "query": {
             "bool": {
                 "must": [
-                    {"term": {"system_version.raw": acqlist_version}},
-                    {
-                        "bool": {
-                            "should": [
-                                {
-                                    "term": {
-                                        "metadata.master_acquisitions.raw": acq_id
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "metadata.slave_acquisitions.raw": acq_id
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                ]
+                  {
+                    "term": {
+                      "dataset.raw": "runconfig-acqlist"
+                    }
+                  },
+                {
+                  "term": {
+                    "metadata.tags.raw": request_id
+                  }
+                }
+              ]
+
+  
             }
         },
         "partial_fields": {
@@ -175,11 +170,11 @@ def get_acqlists_by_acqid(acq_id, acqlist_version):
             }
         }
     }
-    es_index = "grq_{}_s1-gunw-acq-list".format(acqlist_version)
+    es_index = "grq_{}_s1-gunw-runconfig-acq-list".format(acqlist_version)
     result = query_es(query, es_index)
 
     if len(result) == 0:
-        logger.info("Couldn't find acq-list containing acquisition ID: {}".format(acq_id))
+        logger.info("Couldn't find acq-list containing Request ID: {}".format(request_id))
         sys.exit(0)
 
     return [i['fields']['partial'][0] for i in result]
