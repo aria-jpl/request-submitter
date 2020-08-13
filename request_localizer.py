@@ -35,7 +35,7 @@ logger.addFilter(LogFilter())
 
 #"match_pattern": "/(?P<id>S1-GUNW-ifg-cfg-RM-M\\w+S\\w+-TN\\w+-\\d{8}T\\d{6}-\\d{8}T\\d{6}-poeorb-\\w{4})$"
 IFG_CFG_ID_TMPL = "S1-GUNW-ifg-cfg-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}"
-REQUEST_IFG_CFG_ID_TMPL = "S1-GUNW-runconfig-topsapp-R{}-M{:d}S{:d}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}-{}"
+REQUEST_IFG_CFG_ID_TMPL = "runconfig-topsapp-{}-TN{:03d}-{:%Y%m%dT%H%M%S}-{:%Y%m%dT%H%M%S}-{}"
 
 SLC_RE = re.compile(r'(?P<mission>S1\w)_IW_SLC__.*?' +
                     r'_(?P<start_year>\d{4})(?P<start_month>\d{2})(?P<start_day>\d{2})' +
@@ -769,9 +769,9 @@ def get_ifgcfg_metadata( acq_info, project, job_priority, dem_type, track, aoi_i
     id = IFG_CFG_ID_TMPL.format('M', len(master_scene), len(slave_scene), track, parser.parse(slc_master_dt.strftime('%Y%m%dT%H%M%S')), parser.parse(slc_slave_dt.strftime('%Y%m%dT%H%M%S')), orbit_type, ifg_hash[0:4])
 
     if is_request:
-        id = REQUEST_IFG_CFG_ID_TMPL.format('M', len(master_scene), len(slave_scene), track, parser.parse(slc_master_dt.strftime('%Y%m%dT%H%M%S')), parser.parse(slc_slave_dt.strftime('%Y%m%dT%H%M%S')), orbit_type, ifg_hash[0:4])
+        request_id = util.get_request_id(tag_list)
+        id = REQUEST_IFG_CFG_ID_TMPL.format(request_id, track, parser.parse(slc_master_dt.strftime('%Y%m%dT%H%M%S')), parser.parse(slc_slave_dt.strftime('%Y%m%dT%H%M%S')), ifg_hash[0:4])
 
-    #id = "standard-product-ifg-cfg-%s" %id_hash[0:4]
     prod_dir =  id
     os.makedirs(prod_dir, 0o755)
 
