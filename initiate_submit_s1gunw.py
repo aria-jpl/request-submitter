@@ -14,7 +14,7 @@ import backoff
 from hysds.celery import app
 from hysds.dataset_ingest import ingest
 
-from request_localizer import publish_topsapp_runconfig_data, publish_ifgcfg_data, get_acq_object
+from request_localizer import query_es, publish_topsapp_runconfig_data, publish_ifgcfg_data, get_acq_object, process_acqlist_localization
 
 
 # set logger
@@ -179,47 +179,6 @@ def get_acqlists_by_request_id(request_id, acqlist_version):
 
     return [i['fields']['partial'][0] for i in result]
 
-def get_acqlists_by_acqid_index(acq_id, acqlist_version, es_index):
-    """Return all acq-list datasets that contain the acquisition ID."""
-
-    query = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"term": {"system_version.raw": acqlist_version}},
-                    {
-                        "bool": {
-                            "should": [
-                                {
-                                    "term": {
-                                        "metadata.master_acquisitions.raw": acq_id
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "metadata.slave_acquisitions.raw": acq_id
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                ]
-            }
-        },
-        "partial_fields": {
-            "partial": {
-                "exclude": ["city", "context", "continent"],
-            }
-        }
-    }
-    #es_index = "grq_{}_s1-gunw-acq-list".format(acqlist_version)
-    result = query_es(query, es_index)
-
-    if len(result) == 0:
-        logger.info("Couldn't find acq-list containing acquisition ID: {}".format(acq_id))
-        sys.exit(0)
-
-    return [i['fields']['partial'][0] for i in result]
 
 def ifgcfg_exists(ifgcfg_id, version):
     """Return True if ifg-cfg exists."""
@@ -251,6 +210,11 @@ def output_dataset_exists(output_dataset_id, version, index = "grq"):
     result = query_es(query, index)
     return False if len(result) == 0 else True
 
+def get_request_id_from_machine_tag(machine_tag):
+    if isinstance(machine_tag, str):
+        machine_tag = machine_tag.strip().split(',')
+    return util.get_request_id(machine_tag)
+
 
 def main():
     """Main."""
@@ -262,35 +226,33 @@ def main():
     with open(context_file) as f:
         ctx = json.load(f)
 
-    # resolve acquisition id from slc id
-    slc_id = ctx['slc_id']
-    slc_version = ctx['slc_version']
-    acq_version = ctx['acquisition_version']
-    output_dataset_type = ctx.get("output_dataset_type", "runconfig-topsapp")
-    acq_id = resolve_acq(slc_id, acq_version)
-    logger.info("acq_id: {}".format(acq_id))
+    machine_tag = ctx["machine_tag"]
+    runconfig-acqlist_version = ctx["runconfig-acqlist_version"]
+    output_dataset_version = ctx['output_dataset_version']
+    
+    # build args
+    project = util.get_value(ctx, "project", "aria")
+    if type(project) is list:
+        project = project[0]
 
-    # pull all acq-list datasets with acquisition id in either master or slave list
-    output_dataset_version = ctx.get('output_dataset_version', None)
-    if not output_dataset_version:
-        if 'ifgcfg_version' in ctx:
-            output_dataset_version = ctx['ifgcfg_version']
-        else:
-            err_msg = "output_dataset_version NOT found in context"
-            logger.info(err_msg)
-            raise Exception(err_msg)
+    job_type, job_version = ctx['job_specification']['id'].split(':')
 
-    acqlist_version = ctx['acqlist_version']
-    es_index = "grq_{}_s1-gunw-acq-list".format(acqlist_version)
+    request_id = get_request_id_from_machine_tag(machine_tag)
+    if not request_id:
+        raise Exception("request id not found in machine tag : {}".format(machine_tag)
+
+    es_index = "grq_{}_runconfig-acq-list".format(acqlist_version)
     output_dataset_index = "grq_{}_s1-gunw-ifg-cfg".format(output_dataset_version)
     if output_dataset_type == "runconfig-topsapp":
         es_index = "grq_{}_s1-gunw-runconfig-acq-list".format(acqlist_version)
         output_dataset_index = "grq"
 
-    acqlists = get_acqlists_by_acqid_index(acq_id, acqlist_version, es_index)
+    request_data = query_es("grq", request_id)
+    acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
     for acqlist in acqlists:
         logger.info(json.dumps(acqlist, indent=2))
+        process_acqlist_localization(acqlist['metadata'], job_type, job_version, project)
         tag_list = acqlist['metadata'].get("tags", [])
         acq_info = {}
         for acq in acqlist['metadata']['master_acquisitions']:

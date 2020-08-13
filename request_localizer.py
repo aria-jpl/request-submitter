@@ -391,15 +391,6 @@ def get_acq_data_from_list(acq_list):
     return slcs
 
 
-
-def get_value(ctx, param, default_value):
-    value = default_value
-    if param in ctx:
-        value = ctx[param]
-    elif param in ctx["input_metadata"]:
-        value = ctx["input_metadata"][param]
-    return value
-
 def resolve_source(ctx_file):
     """Resolve best URL from acquisition."""
 
@@ -411,28 +402,34 @@ def resolve_source(ctx_file):
     
 
     # build args
-    project = get_value(ctx, "project", "grfn")
+    project = util.get_value(ctx, "project", "aria")
     if type(project) is list:
         project = project[0]
 
-    dem_type= ctx["input_metadata"]["dem_type"]
-    track = ctx["input_metadata"]["track_number"]
+    job_type, job_version = ctx['job_specification']['id'].split(':')
+    input_metadata = ctx["input_metadata"]
+    return process_acqlist_localization(input_metadata, job_type, job_version, project)
 
-    master_acqs = ctx["input_metadata"]["master_acquisitions"]
-    slave_acqs = ctx["input_metadata"]["slave_acquisitions"]
+def process_acqlist_localization(input_metadata, job_type, job_version, project):
 
-    master_scene = ctx["input_metadata"]["master_scenes"]   
-    slave_scene = ctx["input_metadata"]["slave_scenes"]
+    dem_type= input_metadata["dem_type"]
+    track = input_metadata["track_number"]
+
+    master_acqs = input_metadata["master_acquisitions"]
+    slave_acqs = input_metadata["slave_acquisitions"]
+
+    master_scene = input_metadata["master_scenes"]   
+    slave_scene = input_metadata["slave_scenes"]
     logger.info("master_scene : %s" %master_scene)
     logger.info("slave_scene : %s" %slave_scene)
     logger.info("master_acqs : %s" %master_acqs)
     logger.info("slave_acqs : %s" %slave_acqs)
 
-    starttime = ctx["input_metadata"]["starttime"]
-    endtime = ctx["input_metadata"]["endtime"]
+    starttime = input_metadata["starttime"]
+    endtime = input_metadata["endtime"]
     bbox = None
-    if "bbox" in ctx["input_metadata"]:
-        bbox = ctx["input_metadata"]["bbox"]
+    if "bbox" in input_metadata:
+        bbox = input_metadata["bbox"]
 
     #esa_download_queue = "slc-sling-extract-scihub"
     #asf_ngap_download_queue = "slc-sling-extract-asf"
@@ -440,18 +437,18 @@ def resolve_source(ctx_file):
     esa_download_queue = get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
     asf_ngap_download_queue = get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
 
-    union_geojson = ctx["input_metadata"]["union_geojson"]
-    direction = ctx["input_metadata"]["direction"] 
-    platform = ctx["input_metadata"]["platform"]
+    union_geojson = input_metadata["union_geojson"]
+    direction = input_metadata["direction"] 
+    platform = input_metadata["platform"]
     spyddder_sling_extract_version = get_value(ctx, "spyddder_sling_extract_version", "develop")
     multi_acquisition_localizer_version = get_value(ctx, "multi_acquisition_localizer_version", "develop")
 
-    job_priority = ctx["input_metadata"]["job_priority"]
+    job_priority = input_metadata["job_priority"]
     job_type, job_version = ctx['job_specification']['id'].split(':') 
 
     orbitNumber = []
-    if "orbitNumber" in ctx["input_metadata"]:
-        orbitNumber = ctx["input_metadata"]["orbitNumber"]
+    if "orbitNumber" in input_metadata:
+        orbitNumber = input_metadata["orbitNumber"]
 
 
     acq_info = {}
@@ -666,7 +663,6 @@ def publish_topsapp_runconfig_data( acq_info, project, job_priority, dem_type, t
 
     id, md = get_ifgcfg_metadata( acq_info, project, job_priority, dem_type, track, aoi_id, starttime, endtime, master_scene, slave_scene, master_acqs, slave_acqs, orbitNumber, direction, platform, union_geojson, bbox, ifg_hash, in_master_orbit_file, in_slave_orbit_file, True, tag_list)
 
-    tag_list = ["test-3-request-s1gunw-xxxxx-2020-08-10T23:32:00.441180"]
     md["tags"] = tag_list
     request_id = util.get_request_id(tag_list)
     if not request_id:

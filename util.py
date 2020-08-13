@@ -348,6 +348,12 @@ def get_request_id(tag_list):
             break
     return request_id
 
+def get_value(ctx, param, default_value):
+    value = default_value
+    if param in ctx:
+        value = ctx[param]
+    return value
+
 def extract_scihub_ipf(met):
     user = None
     password = None
