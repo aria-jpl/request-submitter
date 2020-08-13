@@ -242,6 +242,11 @@ def main():
     acqlist_version = ctx["runconfig-acqlist_version"]
     output_dataset_version = ctx['output_dataset_version']
     
+    esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
+    asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
+    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "develop")
+    multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "develop")
+
     # build args
     project = util.get_value(ctx, "project", "aria")
     if type(project) is list:
@@ -266,8 +271,9 @@ def main():
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
     for acqlist in acqlists:
-        logger.info(json.dumps(acqlist, indent=2))
-        process_acqlist_localization(acqlist['metadata'], job_type, job_version, project)
+        input_metadata = acqlist["metadata"]
+        logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
+        process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project)
         tag_list = acqlist['metadata'].get("tags", [])
         acq_info = {}
         for acq in acqlist['metadata']['master_acquisitions']:
