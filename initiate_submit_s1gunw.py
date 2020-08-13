@@ -152,7 +152,7 @@ def get_acqlists_by_request_id(request_id, acqlist_version):
                 "must": [
                   {
                     "term": {
-                      "dataset.raw": "runconfig-acqlist"
+                      "dataset.raw": "runconfig-acq-list"
                     }
                   },
                 {
@@ -171,7 +171,7 @@ def get_acqlists_by_request_id(request_id, acqlist_version):
             }
         }
     }
-    es_index = "grq_{}_s1-gunw-runconfig-acq-list".format(acqlist_version)
+    es_index = "grq_{}_runconfig-acq-list".format(acqlist_version)
     result = query_es(query, es_index)
 
     if len(result) == 0:
@@ -262,17 +262,6 @@ def main():
 
     request_submitted_md = {}
     request_submitted_md = create_output_metadata(request_submitted_md, request_data)
-
-    #request_submitted_md[""] = request_data.get("", None)
-    request_submitted_md["program_pi_id"] = request_data.get("program_pi_id", None)
-    request_submitted_md[""] = request_data.get("", None)
-    request_submitted_md[""] = request_data.get("", None)
-    request_submitted_md[""] = request_data.get("", None)
-    request_submitted_md[""] = request_data.get("", None)
-
-    program_pi_id = request_data
-
-
 
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
