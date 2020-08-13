@@ -182,6 +182,8 @@ def main():
             process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project)
         except Exception as err:
             logger.info(str(err))
+            traceback.print_exc()
+            raise Exception(str(err))
 
         
         tag_list = acqlist['metadata'].get("tags", [])
