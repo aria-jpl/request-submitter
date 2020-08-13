@@ -278,7 +278,8 @@ def check_prod_avail(session, link):
 
 def publish_dataset(id, md, version):
     prod_dir =  id
-    os.makedirs(prod_dir, 0o755)
+    if not os.path.isdir(prod_dir):
+        os.makedirs(prod_dir, 0o755)
 
     met_file = os.path.join(prod_dir, "{}.met.json".format(id))
     ds_file = os.path.join(prod_dir, "{}.dataset.json".format(id))

@@ -15,7 +15,7 @@ import util
 from hysds.celery import app
 from hysds.dataset_ingest import ingest
 
-from request_localizer import query_es, publish_topsapp_runconfig_data, publish_ifgcfg_data, get_acq_object, process_acqlist_localization
+from request_localizer import query_es, get_acq_object, process_acqlist_localization
 
 
 # set logger
@@ -176,8 +176,8 @@ def main():
     request_submitted_id = request_id.replace("request", "request-submit", 1)
     request_submitted_md = {}
     request_submitted_md = create_output_metadata(request_submitted_md, request_data)
-    request_submitted_id['geocoded_unfiltered_coherence'] = geocoded_unfiltered_coherence
-    request_submitted_id['geocoded_unfiltered_wrapped_phase'] = geocoded_unfiltered_wrapped_phase
+    request_submitted_md['geocoded_unfiltered_coherence'] = geocoded_unfiltered_coherence
+    request_submitted_md['geocoded_unfiltered_wrapped_phase'] = geocoded_unfiltered_wrapped_phase
 
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
@@ -198,9 +198,10 @@ def main():
         logger.info("tag_list : {} program_pi_id : {}".format(tag_list, program_pi_id))
         request_submitted_md["tags"] = tag_list
 
-        prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
+        if output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
+            prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
 
-
+        
         if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
             logger.info(
                 "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
