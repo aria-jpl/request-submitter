@@ -286,11 +286,8 @@ def main():
             raise Exception(err_msg)
 
     acqlist_version = ctx['runconfig-acqlist_version']
-    es_index = "grq_{}_s1-gunw-acq-list".format(acqlist_version)
-    output_dataset_index = "grq_{}_s1-gunw-ifg-cfg".format(output_dataset_version)
-    if output_dataset_type == "runconfig-topsapp":
-        es_index = "grq_{}_s1-gunw-runconfig-acq-list".format(acqlist_version)
-        output_dataset_index = "grq"
+    es_index = "grq_{}_runconfig-acq-list".format(acqlist_version)
+    output_dataset_index = "grq"
 
     acqlists = get_acqlists_by_acqid_index(acq_id, acqlist_version, es_index)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
