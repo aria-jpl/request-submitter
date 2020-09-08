@@ -1,5 +1,5 @@
 {
-  "label" : "Request S1-GUNW - slc_localizer",
+  "label" : "Request S1-GUNW - slc_localizer File",
   "allowed_accounts": [ "ops" ],
   "enable_dedup": false,
   "params" : [
@@ -22,7 +22,7 @@
       "from": "submitter",
       "default": "develop",
       "type": "jobspec_version",
-      "version_regex": "job-spyddder-sling-extract",
+      "version_regex": "job-spyddder-sling-extract-file",
       "placeholder": "spyddder-man sling extract job version"
     },
     {
