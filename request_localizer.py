@@ -413,13 +413,14 @@ def resolve_source(ctx_file):
   
     esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
     asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
-    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "develop")
-    multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "develop")
+    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "ARIA-446")
+    multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "ARIA-446")
+    destination_type = ctx.get("destination_type", "file")
 
-    return process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project)
+    return process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type)
     
 
-def process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project):
+def process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type="file"):
 
     dem_type= input_metadata["dem_type"]
     track = input_metadata["track_number"]
@@ -465,9 +466,9 @@ def process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_do
         acq_type = "slave"
         acq_info[acq]=get_acq_object(acq, acq_type)
 
-    return sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_version, project, job_priority, job_type, job_version, dem_type, track, starttime, endtime, master_acqs, slave_acqs, orbitNumber, direction, platform, union_geojson, bbox, esa_download_queue, asf_ngap_download_queue)
+    return sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_version, project, job_priority, job_type, job_version, dem_type, track, starttime, endtime, master_acqs, slave_acqs, orbitNumber, direction, platform, union_geojson, bbox, esa_download_queue, asf_ngap_download_queue, destination_type)
 
-def sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_version, project, job_priority, job_type, job_version, dem_type, track, starttime, endtime, master_acqs, slave_acqs, orbitNumber, direction, platform, union_geojson, bbox, esa_download_queue, asf_ngap_download_queue):
+def sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_version, project, job_priority, job_type, job_version, dem_type, track, starttime, endtime, master_acqs, slave_acqs, orbitNumber, direction, platform, union_geojson, bbox, esa_download_queue, asf_ngap_download_queue, destination_type="file"):
     '''
 	This function submits acquisition localizer jobs for mastrer and slaves.
     '''
@@ -483,7 +484,7 @@ def sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_
     logger.info("job_priority : %s" %job_priority)
 
     logger.info("\nSubmitting acquisition localizer job for Masters : %s" %master_acqs)
-    all_done, data  = submit_sling_job(spyddder_sling_extract_version, multi_acquisition_localizer_version, master_acqs, job_priority, esa_download_queue, asf_ngap_download_queue)
+    all_done, data  = submit_sling_job(spyddder_sling_extract_version, multi_acquisition_localizer_version, master_acqs, job_priority, esa_download_queue, asf_ngap_download_queue, destination_type)
     if not all_done:
         err_str = "Failed to download following SLCs :"
         for failed_acq_id in data:
@@ -826,7 +827,7 @@ def get_ifgcfg_metadata( acq_info, project, job_priority, dem_type, track, aoi_i
 
     return id, md
 
-def submit_sling_job(spyddder_sling_extract_version, multi_acquisition_localizer_version, acq_list, priority, esa_download_queue, asf_ngap_download_queue):
+def submit_sling_job(spyddder_sling_extract_version, multi_acquisition_localizer_version, acq_list, priority, esa_download_queue, asf_ngap_download_queue, destination_type="file"):
     #esa_download_queue = "slc-sling-extract-scihub"
     #asf_ngap_download_queue = "slc-sling-extract-asf"
     job_type = "job-acquisition_localizer_multi:{}".format(multi_acquisition_localizer_version)
@@ -837,7 +838,7 @@ def submit_sling_job(spyddder_sling_extract_version, multi_acquisition_localizer
 
 
     try:
-        return acquisition_localizer_multi.sling(acq_list, spyddder_sling_extract_version, multi_acquisition_localizer_version, esa_download_queue, asf_ngap_download_queue, priority, job_type, job_version)
+        return acquisition_localizer_multi.sling(acq_list, spyddder_sling_extract_version, multi_acquisition_localizer_version, esa_download_queue, asf_ngap_download_queue, priority, job_type, job_version, destination_type)
     except Exception as e:
         logger.info("Error processing standard product localizer : %s" %str(e))
         traceback.format_exc()
