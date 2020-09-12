@@ -198,6 +198,7 @@ def main():
         logger.info("tag_list : {} program_pi_id : {}".format(tag_list, program_pi_id))
         request_submitted_md["tags"] = tag_list
 
+        prod_dir = None
         if output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
             prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
 
