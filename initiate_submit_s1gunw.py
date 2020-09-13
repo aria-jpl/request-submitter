@@ -186,7 +186,7 @@ def main():
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
         try:
-            process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, process_acqlist_localization, destination_type)
+            process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type)
         except Exception as err:
             logger.info(str(err))
             traceback.print_exc()
