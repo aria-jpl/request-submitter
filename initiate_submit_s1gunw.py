@@ -153,8 +153,9 @@ def main():
     
     esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
     asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
-    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "develop")
-    multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "develop")
+    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "ARIA-446")
+    multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "ARIA-446")
+    destination_type = "local"
 
     # build args
     project = util.get_value(ctx, "project", "aria")
@@ -185,7 +186,7 @@ def main():
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
         try:
-            process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project)
+            process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, process_acqlist_localization, destination_type)
         except Exception as err:
             logger.info(str(err))
             traceback.print_exc()

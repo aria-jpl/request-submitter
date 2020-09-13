@@ -32,6 +32,22 @@
       "type": "enum",
       "default": "exclude",
       "enumerables": ["exclude", "include"]
+    },
+    {
+      "name": "multi_acquisition_localizer_version",
+      "from": "submitter",
+      "default": "ARIA-446"
+      "type": "jobspec_version",
+      "version_regex": "acquisition_localizer_multi-file",
+      "placeholder": "spyddder-man sling extract job version"
+    },
+    {
+      "name": "spyddder_sling_extract_version",
+      "from": "submitter",
+      "default": "ARIA-446",
+      "type": "jobspec_version",
+      "version_regex": "job-spyddder-sling-extract",
+      "placeholder": "spyddder-man sling extract job version"
     }
   ]
 }
