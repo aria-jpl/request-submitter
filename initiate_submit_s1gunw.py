@@ -174,7 +174,7 @@ def main():
     request_data = util.get_complete_grq_data(request_id)[0]
     logger.info(json.dumps(request_data, indent = 4))
   
-    request_submitted_id = request_id.replace("request", "request-submit", 1)
+    request_submitted_id = request_id.replace("request", "request-s1gunw-submitted", 1)
     request_submitted_md = {}
     request_submitted_md = create_output_metadata(request_submitted_md, request_data)
     request_submitted_md['geocoded_unfiltered_coherence'] = geocoded_unfiltered_coherence
