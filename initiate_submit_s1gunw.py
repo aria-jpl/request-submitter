@@ -199,19 +199,18 @@ def main():
         logger.info("tag_list : {} program_pi_id : {}".format(tag_list, program_pi_id))
         request_submitted_md["tags"] = tag_list
 
-        prod_dir = None
-        if output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
+        if not output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
             prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
-
+            logger.info("prod_dir : {}".format(prod_dir))
         
-        if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
-            logger.info(
-                "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
-        else:
-            ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
-                   app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
-            logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
-            shutil.rmtree(prod_dir)
+            if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
+                logger.info(
+                    "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
+            else:
+                ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
+                       app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
+                logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
+                shutil.rmtree(prod_dir)
 
 
 if __name__ == "__main__":
