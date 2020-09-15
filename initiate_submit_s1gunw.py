@@ -168,8 +168,7 @@ def main():
     if not request_id:
         raise Exception("request id not found in machine tag : {}".format(machine_tag))
 
-    es_index = "grq_{}_runconfig-acq-list".format(acqlist_version)
-    output_dataset_index = "grq"
+
     #request_data = query_es("grq", request_id)
     request_data = util.get_complete_grq_data(request_id)[0]
     logger.info(json.dumps(request_data, indent = 4))
@@ -186,7 +185,9 @@ def main():
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
         try:
+            logger.info("calling process_acqlist_localization for above acqlist") 
             process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type)
+            logger.info("returned from process_acqlist_localization for above acqlist") 
         except Exception as err:
             logger.info(str(err))
             traceback.print_exc()

@@ -421,7 +421,7 @@ def resolve_source(ctx_file):
     
 
 def process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type="local"):
-
+    logger.info("process_acqlist_localization")
     dem_type= input_metadata["dem_type"]
     track = input_metadata["track_number"]
 
@@ -472,7 +472,7 @@ def sling(acq_info, spyddder_sling_extract_version, multi_acquisition_localizer_
     '''
 	This function submits acquisition localizer jobs for mastrer and slaves.
     '''
-    logger.info("%s : %s" %(type(spyddder_sling_extract_version), spyddder_sling_extract_version))
+    logger.info("SLING: %s : %s" %(type(spyddder_sling_extract_version), spyddder_sling_extract_version))
     job_info = {}
     
     acq_list = list(acq_info.keys())
@@ -844,6 +844,7 @@ def submit_sling_job(spyddder_sling_extract_version, multi_acquisition_localizer
         traceback.format_exc()
         raise RuntimeError("Error processing standard product localizer : %s" %str(e))
 
+    return
 
 
 def check_ES_status(doc_id):
