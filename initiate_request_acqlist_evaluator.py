@@ -309,7 +309,7 @@ def main():
                                     acqlist['metadata']['platform'], acqlist['metadata']['union_geojson'],
                                     acqlist['metadata']['bbox'], acqlist['metadata']['full_id_hash'],
                                     acqlist['metadata']['master_orbit_file'], acqlist['metadata']['slave_orbit_file'], tag_list)
-                logger.info(
+            logger.info(
                     "Created runconfig-topsapp {} for runconfig-acqlist {}.".format(prod_dir, acqlist['id']))
 
             if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
@@ -318,7 +318,7 @@ def main():
             else:
                 ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
                        app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
-                logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
+                logger.info("Ingested {} {}.".format(output_dataset_type, prod_dir))
             shutil.rmtree(prod_dir)
         else:
             logger.info(
