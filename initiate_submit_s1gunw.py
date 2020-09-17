@@ -181,7 +181,6 @@ def main():
     request_submitted_md['geocoded_unfiltered_wrapped_phase'] = geocoded_unfiltered_wrapped_phase
 
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
-    acqlists = list(set(acqlists))
 
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
     total_tag_list = []
