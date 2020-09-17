@@ -141,10 +141,10 @@ def all_slcs_exist(acq_ids, acq_version, slc_version):
     if len(result) > 0:
         for hit in result:
             existing_slc_ids.append(hit['_id'])
-    logger.info("slc_ids: {}".format(slc_ids))
+    logger.info("slc_ids_local: {}".format(slc_ids_local))
     logger.info("existing_slc_ids: {}".format(existing_slc_ids))
-    if len(slc_ids) != len(existing_slc_ids):
-        logger.info("Missing SLC IDs: {}".format(list(set(slc_ids) - set(existing_slc_ids))))
+    if len(slc_ids_local) != len(existing_slc_ids):
+        logger.info("Missing SLC IDs: {}".format(list(set(slc_ids_local) - set(existing_slc_ids))))
         return False
     return True
 
