@@ -181,7 +181,10 @@ def main():
     request_submitted_md['geocoded_unfiltered_wrapped_phase'] = geocoded_unfiltered_wrapped_phase
 
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
+    acqlists = list(set(acqlists))
+
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
+    total_tag_list = []
     for acqlist in acqlists:
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
@@ -199,20 +202,22 @@ def main():
         program_pi_id = request_submitted_md["program_pi_id"]
         tag_list.append(program_pi_id)
         logger.info("tag_list : {} program_pi_id : {}".format(tag_list, program_pi_id))
-        request_submitted_md["tags"] = tag_list
+        total_tag_list = total_tag_list.extend(tag_list)
 
-        if not output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
-            prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
-            logger.info("prod_dir : {}".format(prod_dir))
+    request_submitted_md["tags"] = list(set(total_tag_list))
+
+    if not output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
+        prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
+        logger.info("prod_dir : {}".format(prod_dir))
         
-            if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
-                logger.info(
-                    "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
-            else:
-                ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
-                       app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
-                logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
-                shutil.rmtree(prod_dir)
+        if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
+            logger.info(
+                "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
+        else:
+            ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
+                app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
+            logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
+            shutil.rmtree(prod_dir)
 
 
 if __name__ == "__main__":
