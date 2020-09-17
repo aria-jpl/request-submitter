@@ -145,11 +145,12 @@ def main():
 
     machine_tag = ctx["machine_tag"]
     acqlist_version = ctx["runconfig-acqlist_version"]
-    output_dataset_version = ctx['output_dataset_version']
+    output_dataset_version = ctx.get('output_dataset_version', "v2.0.0")
     geocoded_unfiltered_coherence = ctx['geocoded_unfiltered_coherence']
     geocoded_unfiltered_wrapped_phase = ctx['geocoded_unfiltered_wrapped_phase']
 
     output_dataset_type = "request-submit"
+    output_dataset_index = "grq_{}_request-submit".format(output_dataset_version)
     
     esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
     asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
