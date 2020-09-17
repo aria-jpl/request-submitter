@@ -310,7 +310,7 @@ def main():
                                     acqlist['metadata']['bbox'], acqlist['metadata']['full_id_hash'],
                                     acqlist['metadata']['master_orbit_file'], acqlist['metadata']['slave_orbit_file'], tag_list)
             logger.info(
-                    "Created runconfig-topsapp {} for runconfig-acqlist {}.".format(prod_dir, acqlist['id']))
+                "Created runconfig-topsapp {} for runconfig-acqlist {}.".format(prod_dir, acqlist['id']))
 
             if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
                 logger.info(
