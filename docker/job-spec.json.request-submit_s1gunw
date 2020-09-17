@@ -8,8 +8,8 @@
     "$HOME/verdi/etc/settings.conf": "/home/ops/verdi/ops/request-submitter/settings.conf"
   },
   "disk_usage":"100GB",
-  "soft_time_limit": 1800,
-  "time_limit": 2100,
+  "soft_time_limit": 86400,
+  "time_limit": 87000,
   "disk_usage": "2GB",
   "recommended-queues": [ "aria-standard_product-evaluator" ],
   "params" : [
