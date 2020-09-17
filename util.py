@@ -2367,4 +2367,7 @@ def get_urls(info):
         urls.append("%s/%s" % (prod_url, fields['metadata']['archive_filename']))
     return urls
 
-
+def remove_local(s, suffix):
+    if suffix and s.endswith(suffix):
+        return s[:-len(suffix)]
+    return s

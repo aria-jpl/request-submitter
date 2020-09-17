@@ -10,6 +10,7 @@ import logging
 import traceback
 import shutil
 import backoff
+import util
 
 from hysds.celery import app
 from hysds.dataset_ingest import ingest
@@ -60,8 +61,7 @@ def query_es(query, idx, url=app.conf['GRQ_ES_URL']):
 
 
 def resolve_acq(slc_id, version):
-    """Resolve acquisition id."""
-
+    slc_id = util.remove_local(slc_id, "-local")   
     query = {
         "query": {
             "bool": {
@@ -118,15 +118,22 @@ def all_slcs_exist(acq_ids, acq_version, slc_version):
         raise RuntimeError(error_string)
 
     # check all slc ids exist
+    slc_ids_local = []
+    for slc_id in slc_ids:
+        slc_id_local = slc_id
+        if not slc_id_local.lower().endswith("-local"):
+            slc_id_local = "{}-local".format(slc_id_local)
+        slc_ids_local.append(slc_id_local)
+
     slc_query = {
         "query": {
             "ids": {
-                "values": slc_ids,
+                "values": slc_ids_local,
             }
         },
         "fields": []
     }
-    slc_index = "grq_{}_s1-iw_slc".format(slc_version)
+    slc_index = "grq_{}_s1-iw_slc-local".format(slc_version)
     result = query_es(slc_query, slc_index)
 
     # extract slc ids that exist
@@ -252,7 +259,7 @@ def output_dataset_exists(output_dataset_id, version, index = "grq"):
         },
         "fields": []
     }
-    #index = "grq_{}_s1-gunw-ifg-cfg".format(version)
+    #index = "grq_{}_runconfig-topsapp".format(version)
     result = query_es(query, index)
     return False if len(result) == 0 else True
 
@@ -269,14 +276,15 @@ def main():
 
     # resolve acquisition id from slc id
     slc_id = ctx['slc_id']
+    slc_id_real = util.remove_local(slc_id, "-local")
     slc_version = ctx['slc_version']
     acq_version = ctx['acquisition_version']
     output_dataset_type = ctx.get("output_dataset_type", "runconfig-topsapp")
-    acq_id = resolve_acq(slc_id, acq_version)
+    acq_id = resolve_acq(slc_id_real, acq_version)
     logger.info("acq_id: {}".format(acq_id))
 
     # pull all acq-list datasets with acquisition id in either master or slave list
-    output_dataset_version = ctx.get('output_dataset_version', None)
+    output_dataset_version = ctx.get('output_dataset_version', "v2.0")
     if not output_dataset_version:
         if 'ifgcfg_version' in ctx:
             output_dataset_version = ctx['ifgcfg_version']
@@ -287,7 +295,7 @@ def main():
 
     acqlist_version = ctx['runconfig-acqlist_version']
     es_index = "grq_{}_runconfig-acq-list".format(acqlist_version)
-    output_dataset_index = "grq"
+    output_dataset_index = "grq_{}_runconfig-topsapp".format(output_dataset_version)
 
     acqlists = get_acqlists_by_acqid_index(acq_id, acqlist_version, es_index)
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
@@ -318,11 +326,11 @@ def main():
             else:
                 ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
                        app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
-                logger.info("Ingested {} {}.".format(output_dataset_type, prod_dir))
+                logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
             shutil.rmtree(prod_dir)
         else:
             logger.info(
-                "Not creating {} for acq-list {}.".format(output_dataset, acqlist['id']))
+                "NOT all SLCs exists. Not creating {} for acq-list {}.".format(output_dataset_type, acqlist['id']))
 
 
 if __name__ == "__main__":
