@@ -183,32 +183,27 @@ def main():
     acqlists = get_acqlists_by_request_id(request_id, acqlist_version)
 
     logger.info("Found {} matching acq-list datasets".format(len(acqlists)))
-    total_tag_list = []
+    request_submitted_md["tags"] = []
+
     for acqlist in acqlists:
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
-        try:
-            logger.info("calling process_acqlist_localization for above acqlist") 
-            process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type)
-            logger.info("returned from process_acqlist_localization for above acqlist") 
-        except Exception as err:
-            logger.info(str(err))
-            traceback.print_exc()
-            raise Exception(str(err))
+        logger.info("calling process_acqlist_localization for above acqlist")
+        process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type)
+        logger.info("returned from process_acqlist_localization for above acqlist")
 
-        
         tag_list = acqlist['metadata'].get("tags", [])
         program_pi_id = request_submitted_md["program_pi_id"]
         tag_list.append(program_pi_id)
         logger.info("tag_list : {} program_pi_id : {}".format(tag_list, program_pi_id))
-        total_tag_list = total_tag_list.extend(tag_list)
+        request_submitted_md["tags"].extend(tag_list)
 
-    request_submitted_md["tags"] = list(set(total_tag_list))
+    request_submitted_md["tags"] = list(set(request_submitted_md["tags"]))
 
     if not output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
         prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
         logger.info("prod_dir : {}".format(prod_dir))
-        
+
         if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
             logger.info(
                 "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
