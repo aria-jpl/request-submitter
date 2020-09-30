@@ -154,7 +154,7 @@ def main():
     
     esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
     asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
-    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "ARIA-446")
+    spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "ARIA-446_singularity")
     multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "ARIA-446")
     destination_type = "local"
 
@@ -189,7 +189,7 @@ def main():
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
         logger.info("calling process_acqlist_localization for above acqlist")
-        process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type)
+        process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type, request_id)
         logger.info("returned from process_acqlist_localization for above acqlist")
 
         tag_list = acqlist['metadata'].get("tags", [])
