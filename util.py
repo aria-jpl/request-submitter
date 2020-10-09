@@ -2371,3 +2371,14 @@ def remove_local(s, suffix):
     if suffix and s.endswith(suffix):
         return s[:-len(suffix)]
     return s
+
+def add_local(slc_id_local):
+    if not slc_id_local.lower().endswith("-local"):
+        slc_id_local = "{}-local".format(slc_id_local)
+    return slc_id_local
+
+def add_local_list(slc_id_list):
+    slc_id_local_list = []
+    for slc_id in slc_id_list:
+        slc_id_local_list.append(add_local(slc_id))
+    return slc_id_local_list
