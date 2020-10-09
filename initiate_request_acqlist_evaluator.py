@@ -311,7 +311,7 @@ def main():
             prod_dir = publish_topsapp_runconfig_data(acq_info, acqlist['metadata']['project'], acqlist['metadata']['job_priority'],
                                     acqlist['metadata']['dem_type'], acqlist['metadata']['track_number'], acqlist['metadata']['tags'],
                                     acqlist['metadata']['starttime'], acqlist['metadata']['endtime'],
-                                    acqlist['metadata']['master_scenes'], acqlist['metadata']['slave_scenes'],
+                                    util.add_local_list(acqlist['metadata']['master_scenes']), util.add_local_list(acqlist['metadata']['slave_scenes']),
                                     acqlist['metadata']['master_acquisitions'], acqlist['metadata']['slave_acquisitions'],
                                     acqlist['metadata']['orbitNumber'], acqlist['metadata']['direction'],
                                     acqlist['metadata']['platform'], acqlist['metadata']['union_geojson'],
@@ -320,14 +320,14 @@ def main():
             logger.info(
                 "Created runconfig-topsapp {} for runconfig-acqlist {}.".format(prod_dir, acqlist['id']))
 
-            if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
+            if util.dataset_exists(prod_dir, "runconfig-topsapp"):
                 logger.info(
                     "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
             else:
                 ingest(prod_dir, 'datasets.json', app.conf.GRQ_UPDATE_URL,
                        app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
                 logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
-            shutil.rmtree(prod_dir)
+            #shutil.rmtree(prod_dir)
         else:
             logger.info(
                 "NOT all SLCs exists. Not creating {} for acq-list {}.".format(output_dataset_type, acqlist['id']))

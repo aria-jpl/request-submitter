@@ -98,22 +98,6 @@ def get_acqlists_by_request_id(request_id, acqlist_version):
     return [i['fields']['partial'][0] for i in result]
 
 
-def output_dataset_exists(output_dataset_id, version, index = "grq"):
-    """Return True if ifg-cfg exists."""
-        
-    query = {
-        "query": {
-            "ids": {
-                "values": [output_dataset_id],
-            }
-        },
-        "fields": []
-    }
-    #index = "grq_{}_s1-gunw-ifg-cfg".format(version)
-    result = query_es(query, index)
-    return False if len(result) == 0 else True
-
-
 def get_request_id_from_machine_tag(machine_tag):
     if isinstance(machine_tag, str):
         machine_tag = machine_tag.strip().split(',')
@@ -177,6 +161,11 @@ def main():
     request_submitted_id = request_id.replace("request", "request-s1gunw-submitted", 1)
     request_submitted_md = {}
     request_submitted_md = create_output_metadata(request_submitted_md, request_data)
+    if "master_scenes" in request_submitted_md:
+        request_submitted_md["master_scenes"] = util.add_local_list(request_submitted_md["master_scenes"])
+    if "slave_scenes" in request_submitted_md:
+        request_submitted_md["slave_scenes"] = util.add_local_list(request_submitted_md["slave_scenes"])
+
     request_submitted_md['geocoded_unfiltered_coherence'] = geocoded_unfiltered_coherence
     request_submitted_md['geocoded_unfiltered_wrapped_phase'] = geocoded_unfiltered_wrapped_phase
 
@@ -200,11 +189,11 @@ def main():
 
     request_submitted_md["tags"] = list(set(request_submitted_md["tags"]))
 
-    if not output_dataset_exists(request_submitted_id, output_dataset_version, output_dataset_index):
+    if not util.dataset_exists(request_submitted_id, "request-submit"):
         prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
         logger.info("prod_dir : {}".format(prod_dir))
 
-        if output_dataset_exists(prod_dir, output_dataset_version, output_dataset_index):
+        if util.dataset_exists(prod_dir, "request-submit"):
             logger.info(
                 "Not ingesting {} {}. Already exists.".format(output_dataset_type, prod_dir))
         else:
