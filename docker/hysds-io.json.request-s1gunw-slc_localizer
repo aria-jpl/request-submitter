@@ -7,22 +7,22 @@
       "name": "asf_ngap_download_queue",
       "from": "submitter",
       "type": "enum",
-      "default": "slc-sling-extract-asf",
-      "enumerables": ["slc-sling-extract-asf", "factotum-job_worker-asf_throttled", "NA"]
+      "default": "slc-sling-extract-local-asf",
+      "enumerables": ["slc-sling-extract-local-asf", "factotum-job_worker-asf_throttled", "NA"]
     },
     {
       "name": "esa_download_queue",
       "from": "submitter",
       "type": "enum",
-      "default": "slc-sling-extract-scihub",
-      "enumerables": ["slc-sling-extract-scihub", "factotum-job_worker-apihub_throttled", "factotum-job_worker-scihub_throttled"]
+      "default": "slc-sling-extract-local-scihub",
+      "enumerables": ["slc-sling-extract-local-scihub", "factotum-job_worker-apihub_throttled", "factotum-job_worker-scihub_throttled"]
     },
     {
       "name": "spyddder_sling_extract_version",
       "from": "submitter",
-      "default": "develop",
+      "default": "ARIA-446_singularity",
       "type": "jobspec_version",
-      "version_regex": "job-spyddder-sling-extract-file",
+      "version_regex": "job-spyddder-sling-extract-local",
       "placeholder": "spyddder-man sling extract job version"
     },
     {
