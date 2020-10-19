@@ -411,8 +411,8 @@ def resolve_source(ctx_file):
     job_type, job_version = ctx['job_specification']['id'].split(':')
     input_metadata = ctx["input_metadata"]
   
-    esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-scihub")
-    asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-asf")
+    esa_download_queue = util.get_value(ctx, "esa_download_queue", "slc-sling-extract-local-scihub")
+    asf_ngap_download_queue = util.get_value(ctx, "asf_ngap_download_queue", "slc-sling-extract-local-asf")
     spyddder_sling_extract_version = util.get_value(ctx, "spyddder_sling_extract_version", "ARIA-446_singularity")
     multi_acquisition_localizer_version = util.get_value(ctx, "multi_acquisition_localizer_version", "ARIA-446")
     destination_type = ctx.get("destination_type", "local")
