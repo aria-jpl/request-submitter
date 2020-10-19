@@ -1,5 +1,5 @@
 {
-  "command": "/home/ops/verdi/ops/request/initiate_request_localizer.sh",
+  "command": "/home/ops/verdi/ops/request-submitter/initiate_request_localizer.sh",
   "imported_worker_files": {
     "$HOME/.netrc": ["/home/ops/.netrc"],
     "$HOME/.aws": ["/home/ops/.aws", "ro"],
