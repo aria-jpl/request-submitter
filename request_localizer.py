@@ -676,7 +676,7 @@ def publish_topsapp_runconfig_data( acq_info, project, job_priority, dem_type, t
         logger.info(err_msg)
         raise Exception(err_msg)
     
-    request_submit_id = request_id.replace("request", "request-submit", 1)
+    request_submit_id = request_id.replace("request", "request-s1gunw-submitted", 1)
    
     #Search GRQ for request metadata
     data = query_es(GRQ_ES_ENDPOINT, request_submit_id)
