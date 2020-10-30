@@ -687,7 +687,11 @@ def publish_topsapp_runconfig_data( acq_info, project, job_priority, dem_type, t
     md["geocoded_unfiltered_coherence"] = request_md["geocoded_unfiltered_coherence"]
     md["geocoded_unfiltered_wrapped_phase"] = request_md["geocoded_unfiltered_wrapped_phase"]
  
-    
+   
+    for tag in tag_list:
+        if tag not in md["tags"]
+            md["tags"].append(tag)
+ 
     return publish_dataset(id, md)
 
 
