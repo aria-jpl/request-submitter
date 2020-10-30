@@ -132,6 +132,7 @@ def main():
     output_dataset_version = ctx.get('output_dataset_version', "v2.0.0")
     geocoded_unfiltered_coherence = ctx['geocoded_unfiltered_coherence']
     geocoded_unfiltered_wrapped_phase = ctx['geocoded_unfiltered_wrapped_phase']
+    group_id = ctx.get("group_id", "")
 
     output_dataset_type = "request-submit"
     output_dataset_index = "grq_{}_request-submit".format(output_dataset_version)
@@ -184,7 +185,10 @@ def main():
         tag_list = acqlist['metadata'].get("tags", [])
         program_pi_id = request_submitted_md["program_pi_id"]
         tag_list.append(program_pi_id)
-        logger.info("tag_list : {} program_pi_id : {}".format(tag_list, program_pi_id))
+        if group_id:
+            tag_list.append(group_id)
+
+        logger.info("tag_list : {} program_pi_id : {} group_id : {}".format(tag_list, program_pi_id, group_id))
         request_submitted_md["tags"].extend(tag_list)
 
     request_submitted_md["tags"] = list(set(request_submitted_md["tags"]))
