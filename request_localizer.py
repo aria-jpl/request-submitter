@@ -689,7 +689,7 @@ def publish_topsapp_runconfig_data( acq_info, project, job_priority, dem_type, t
  
    
     for tag in tag_list:
-        if tag not in md["tags"]
+        if tag not in md["tags"]:
             md["tags"].append(tag)
  
     return publish_dataset(id, md)
