@@ -97,7 +97,7 @@ def get_acqlists_by_request_id(request_id, acqlist_version):
 
     return [i['fields']['partial'][0] for i in result]
 
-def get_datasets_by_request_id(request_id, dataset_type, dataset_version):
+def get_datasets_by_request_id(request_id, dataset_type, es_index="grq", dataset_version="*"):
     """Return all acq-list datasets that contain the acquisition ID."""
 
     query = {
@@ -125,7 +125,6 @@ def get_datasets_by_request_id(request_id, dataset_type, dataset_version):
             }
         }
     }
-    es_index = "grq_{}_runconfig-acq-list".format(dataset_version)
     result = query_es(query, es_index)
 
     if len(result) == 0:
