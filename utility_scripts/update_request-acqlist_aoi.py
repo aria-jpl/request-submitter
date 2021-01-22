@@ -31,13 +31,14 @@ logging.basicConfig(format=log_format, level=logging.INFO)
 
 def appennd_audit_trail_request_aoi(es_url, id, aoi):
     try:
-        es_index = "grq_*_runconfig-acqlist-audit_trail"
+        es_index = "grq_v2.0.0_runconfig-acqlist-audit_trail"
         _type = "runconfig-acqlist-audit_trail"
 
         ES = elasticsearch.Elasticsearch(es_url)
         ES.update(index=es_index, doc_type=_type, id=id,
               body={"doc": {"metadata": {"aoi": aoi}}}) 
-        print("Updated  audit trail : %s AOI :  %s successfully" %(id, aoi ))    
+        print("Updated  audit trail : %s AOI :  %s successfully" %(id, aoi ))   
+        #exit(0) 
     except Exception as err:
         print("ERROR : updationg AOI : %s" %str(err))
 
@@ -48,6 +49,7 @@ def remove_local(s, suffix):
 
 def query_es(query, rest_url, es_index):
     """Query ES."""
+    print(json.dumps(query, indent=2))
     url = "{}/{}/_search?search_type=scan&scroll=60&size=100".format(rest_url, es_index)
     #print("url: {}".format(url))
     r = requests.post(url, data=json.dumps(query))
@@ -115,36 +117,64 @@ def get_ifg_hash(master_slcs,  slave_slcs):
             ]).encode("utf8")).hexdigest()
     return id_hash
 
+def get_aoi(aoi_list, request_id, track):
+    new_aoi = None
+    if isinstance(track, list):
+        track = track[0]
+    track = int(track)
 
+    aoi_request_id = request_id.replace("-", "").replace("_", "").replace(":", "").replace(".", "")
+    for aoi in aoi_list:
+        aoi_temp = aoi[len("AOI_ondemand_"):]
+        aoi_temp_array = aoi_temp.split('_')
+        temp_request_id = aoi_temp_array[0]
+        aoi_track =  int(aoi_temp_array[2])
+        if aoi_request_id == temp_request_id and track == aoi_track:
+            new_aoi = aoi
+            break
+
+    return new_aoi
+        
 def update_AOI(grq_es_url, hit, aoi_list):
     request_submit_id = hit["_id"]
 
     met = hit['_source']['metadata']
     machine_tag = met["tags"]
     request_id = get_request_id_from_machine_tag(machine_tag)
-    aoi_request_id = request_id.replace("-", "").replace("_", "").replace(":", "").replace(".", "")
-    aoi ="{}{}".format("AOI_ondemand_AOI", aoi_request_id)
+    #aoi_request_id = request_id.replace("-", "").replace("_", "").replace(":", "").replace(".", "")
+    #aoi ="{}{}".format("AOI_ondemand_AOI", aoi_request_id)
 
     
-    print("{} : {} : {}".format(request_submit_id, request_id, aoi))
+    #print("{} : {} : {}".format(request_submit_id, request_id, aoi))
 
-    if aoi not in aoi_list:
-        print("{} NOT in list".format(aoi))
+    #if aoi not in aoi_list:
+        #print("{} NOT in list".format(aoi))
 
     audit_trail_list = get_datasets_by_request_id(request_id, "runconfig-acqlist-audit_trail", "grq_*_runconfig-acqlist-audit_trail")
+    print("{} autit trail found for request_id : {}".format(len(audit_trail_list), request_id))
     for audit_trail in audit_trail_list:
-        print(audit_trail["_id"])
+        #print(audit_trail["_id"])
         met = audit_trail['_source']['metadata']
         machine_tag = met["tags"]
+        track = met["track_number"]
         exist_aoi = met["aoi"]
+        new_aoi = get_aoi(aoi_list, request_id, track)
         failure_reason = met["failure_reason"].strip()
+        if not new_aoi:
+            print("NO AOI FOUND FOR REQUEST : {} && track : {}".format(request_id, track))
+            continue
+        else:
+            print("AOI FOUND FOR REQUEST : {} && track : {} : {}".format(request_id, track, new_aoi))
+        
+
         if not failure_reason:
             print("{} : {} : {} : PASSED".format(audit_trail["_id"], exist_aoi, failure_reason))
         else:
             print("{} : {} : {} : FAILED".format(audit_trail["_id"], exist_aoi, failure_reason))
-        if aoi not in exist_aoi:
-            exist_aoi.append(aoi)
-            
+        if new_aoi not in exist_aoi:
+            exist_aoi.append(new_aoi)
+            appennd_audit_trail_request_aoi(grq_es_url, audit_trail["_id"], exist_aoi)
+        
 
 def get_datasets_by_request_id(request_id, dataset_type, es_index="grq", rest_url=app.conf['GRQ_ES_URL']):
     """Return all acq-list datasets that contain the acquisition ID."""
@@ -253,8 +283,9 @@ if __name__ == "__main__":
    
     aoi_list = []
     aois = get_dataset(grq_es_url, "area_of_interest", "grq_v3.0_area_of_interest")
+    print(len(aois))
     for aoi in aois:
-        if aoi["_id"].startswith("AOI_ondemand_AOI"):
+        if aoi["_id"].startswith("AOI_ondemand"):
             aoi_list.append(aoi["_id"])
     print(aoi_list)
     hits = get_dataset(grq_es_url, "request-submit", "grq_*_request-submit")
