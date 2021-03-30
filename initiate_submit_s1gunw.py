@@ -178,9 +178,6 @@ def main():
     for acqlist in acqlists:
         input_metadata = acqlist["metadata"]
         logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
-        logger.info("calling process_acqlist_localization for above acqlist")
-        process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type, request_id)
-        logger.info("returned from process_acqlist_localization for above acqlist")
 
         tag_list = acqlist['metadata'].get("tags", [])
         program_pi_id = request_submitted_md["program_pi_id"]
@@ -191,7 +188,8 @@ def main():
         logger.info("tag_list : {} program_pi_id : {} group_id : {}".format(tag_list, program_pi_id, group_id))
         request_submitted_md["tags"].extend(tag_list)
 
-    request_submitted_md["tags"] = list(set(request_submitted_md["tags"]))
+    request_submitted_md["tags"] = list(set(request_submitted_md["tags"])
+
 
     if not util.dataset_exists(request_submitted_id, "request-submit"):
         prod_dir = util.publish_dataset(request_submitted_id, request_submitted_md, output_dataset_version)
@@ -205,6 +203,13 @@ def main():
                 app.conf.DATASET_PROCESSED_QUEUE, os.path.abspath(prod_dir), None)
             logger.info("Ingesting {} {}.".format(output_dataset_type, prod_dir))
             shutil.rmtree(prod_dir)
+
+    for acqlist in acqlists:
+        input_metadata = acqlist["metadata"]
+        logger.info("input_metadata : \n{}".format(json.dumps(input_metadata, indent=2)))
+        logger.info("calling process_acqlist_localization for above acqlist")
+        process_acqlist_localization(input_metadata, esa_download_queue, asf_ngap_download_queue, spyddder_sling_extract_version, multi_acquisition_localizer_version, job_type, job_version, project, destination_type, request_id)
+        logger.info("returned from process_acqlist_localization for above acqlist")
 
 
 if __name__ == "__main__":
