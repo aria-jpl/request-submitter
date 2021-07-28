@@ -188,7 +188,7 @@ def main():
         logger.info("tag_list : {} program_pi_id : {} group_id : {}".format(tag_list, program_pi_id, group_id))
         request_submitted_md["tags"].extend(tag_list)
 
-    request_submitted_md["tags"] = list(set(request_submitted_md["tags"])
+    request_submitted_md["tags"] = list(set(request_submitted_md["tags"]))
 
 
     if not util.dataset_exists(request_submitted_id, "request-submit"):
